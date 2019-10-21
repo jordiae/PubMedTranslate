@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 import tempfile
 import gzip
 import time
-
+import sys
 
 PUBMED_XMLS_PATH = '/data/MESINESP/pubmed_training/baseline_pubed_xmls'
 # PUBMED_XMLS_PATH = os.path.join('data', 'pubmed_xmls')
@@ -13,6 +13,8 @@ OUTPUT_PATH = os.path.join('output')
 GENIASS_PATH = os.path.join('bin', 'geniass')
 GENIASS_EX = 'geniass'
 TEMP_PATH = os.path.join('output', 'temp')
+
+sys.stdout = open(os.path.join(OUTPUT_PATH, 'log.txt'), 'w')
 
 
 def get_mesh2decs_dict(decs_codes_path):
