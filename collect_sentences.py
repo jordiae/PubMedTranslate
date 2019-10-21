@@ -39,7 +39,7 @@ def parse_xml(filename, xml, mesh2decs_dict):
     root = tree.getroot()
     parsed_xml = []
     skip = 0
-    print('Parsing', filename)
+    print('Parsing', filename, flush=True)
     for index, pubmedarticle in enumerate(root):
         try:
             # id
@@ -69,7 +69,7 @@ def parse_xml(filename, xml, mesh2decs_dict):
             # print('Skipping article', index, 'at', filename)
             skip += 1
             continue
-    print('Skipped', skip, 'articles of', len(root))
+    print('Skipped', skip, 'articles of', len(root), flush=True)
     return parsed_xml
 
 
@@ -109,7 +109,7 @@ def collect_sentences(parsed_xmls):
     for index_xml, parsed_xml in enumerate(parsed_xmls):
         for index_article, article in enumerate(parsed_xmls[parsed_xml]):
             print('Collecting sentences from article', index_article + 1, 'of', len(parsed_xmls[parsed_xml]), 'in', \
-                  parsed_xml, '(', index_xml, '/', len(parsed_xmls), ')')
+                  parsed_xml, '(', index_xml, '/', len(parsed_xmls), ')', flush=True)
             sentences2translate.append(article['title'])
             for sentence in split_sentences(article['abstractText']['ab_es']):
                 sentences2translate.append(sentence)
@@ -131,7 +131,7 @@ def main():
     parsed_xmls = parse_xmls(xmls, mesh2decs_dict)
     collect_sentences_from_parsed_xmls(parsed_xmls)
     t1 = time.time()
-    print('Ellapsed', t1-t0)
+    print('Ellapsed', t1-t0, flush=True)
 
 
 if __name__ == '__main__':
