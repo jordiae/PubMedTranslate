@@ -111,22 +111,27 @@ def inverse_splitlines(lines):
 
 
 def collect_sentences(parsed_xmls):
-    sentences2translate = []
+    # sentences2translate = []
     for index_xml, parsed_xml in enumerate(parsed_xmls):
+        sentences2translate = []
         for index_article, article in enumerate(parsed_xmls[parsed_xml]):
             print('Collecting sentences from article', index_article + 1, 'of', len(parsed_xmls[parsed_xml]), 'in',
                   parsed_xml, '(', index_xml, '/', len(parsed_xmls), ')', flush=True)
             sentences2translate.append(article['title'])
             for sentence in split_sentences(article['abstractText']['ab_es']):
                 sentences2translate.append(sentence)
-    return sentences2translate
+        sentences_path = os.path.join(TEMP_PATH, 'sentences_en.src')
+        with open(sentences_path, 'a') as f:
+            f.write(inverse_splitlines([s.strip() for s in sentences2translate]))
+    # return sentences2translate
 
 
 def collect_sentences_from_parsed_xmls(parsed_xmls):
-    sentences2translate = collect_sentences(parsed_xmls)
-    sentences_path = os.path.join(TEMP_PATH, 'sentences_en.src')
-    with open(sentences_path, 'w') as f:
-        f.write(inverse_splitlines([s.strip() for s in sentences2translate]))
+    collect_sentences(parsed_xmls)
+    # sentences2translate = collect_sentences(parsed_xmls)
+    # sentences_path = os.path.join(TEMP_PATH, 'sentences_en.src')
+    # with open(sentences_path, 'w') as f:
+    #   f.write(inverse_splitlines([s.strip() for s in sentences2translate]))
 
 
 def main():
