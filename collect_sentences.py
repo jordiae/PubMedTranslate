@@ -82,8 +82,9 @@ def parse_xml(filename, xml, mesh2decs_dict):
 def parse_xmls(xmls, mesh2decs_dict):
     parsed_xmls = {}
     for filename, xml in xmls.items():
-        parsed_xmls[filename] = parse_xml(filename, xml, mesh2decs_dict)
-    return parsed_xmls
+        #parsed_xmls[filename] = parse_xml(filename, xml, mesh2decs_dict)
+        yield filename, parse_xml(filename, xml, mesh2decs_dict)
+    #return parsed_xmls
 
 
 def split_sentences(text):
@@ -110,13 +111,13 @@ def inverse_splitlines(lines):
     return s
 
 
-def collect_sentences(parsed_xmls):
+def collect_sentences(xmls, mesh2decs_dict):
     # sentences2translate = []
-    for index_xml, parsed_xml in enumerate(parsed_xmls):
+    for index_xml, (filename, parsed_xml) in enumerate(parse_xmls(xmls, mesh2decs_dict)):
         sentences2translate = []
-        for index_article, article in enumerate(parsed_xmls[parsed_xml]):
-            print('Collecting sentences from article', index_article + 1, 'of', len(parsed_xmls[parsed_xml]), 'in',
-                  parsed_xml, '(', index_xml, '/', len(parsed_xmls), ')', flush=True)
+        for index_article, article in enumerate(parsed_xml):
+            print('Collecting sentences from article', index_article + 1, 'of', len(parsed_xml), 'in',
+                  filename, '(', index_xml, '/', len(xmls), ')', flush=True)
             sentences2translate.append(article['title'])
             for sentence in split_sentences(article['abstractText']['ab_es']):
                 sentences2translate.append(sentence)
@@ -127,7 +128,8 @@ def collect_sentences(parsed_xmls):
 
 
 def collect_sentences_from_parsed_xmls(parsed_xmls):
-    collect_sentences(parsed_xmls)
+    pass
+    #collect_sentences(parsed_xmls)
     # sentences2translate = collect_sentences(parsed_xmls)
     # sentences_path = os.path.join(TEMP_PATH, 'sentences_en.src')
     # with open(sentences_path, 'w') as f:
@@ -139,8 +141,8 @@ def main():
     mesh2decs_dict = get_mesh2decs_dict(open(DeCS_CODES_PATH, 'r'))
     xml_paths = [os.path.join(PUBMED_XMLS_PATH, path) for path in sorted(os.listdir(PUBMED_XMLS_PATH))]
     xmls = read_xmls(xml_paths)
-    parsed_xmls = parse_xmls(xmls, mesh2decs_dict)
-    collect_sentences_from_parsed_xmls(parsed_xmls)
+    # parsed_xmls = parse_xmls(xmls, mesh2decs_dict)
+    collect_sentences(xmls, mesh2decs_dict)
     t1 = time.time()
     print('Ellapsed', t1-t0, flush=True)
 
