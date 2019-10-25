@@ -15,6 +15,7 @@ GENIASS_EX = 'geniass'
 TEMP_PATH = os.path.join('output', 'temp')
 
 sys.stdout = open(os.path.join(OUTPUT_PATH, 'log.txt'), 'w')
+sys.stderr = open(os.path.join(OUTPUT_PATH, 'err.txt'), 'w')
 
 
 def get_mesh2decs_dict(decs_codes_path):
