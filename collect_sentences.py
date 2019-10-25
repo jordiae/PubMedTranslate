@@ -49,16 +49,19 @@ def parse_xml(filename, xml, mesh2decs_dict):
             pmid_node = pubmedarticle.find('MedlineCitation').find('PMID')  # pubmedarticle[0][0]
             id_ = pmid_node.text
             # journal
-            issn_node = pubmedarticle.find('MedlineCitation').find('Article').find('Journal').find('ISSN')  # pubmedarticle[0][3][0][0]
+            # pubmedarticle[0][3][0][0]
+            issn_node = pubmedarticle.find('MedlineCitation').find('Article').find('Journal').find('ISSN')
             journal = issn_node.text
             # title
             articletitle_node = pubmedarticle.find('MedlineCitation').find('Article').find('ArticleTitle')  # [0][3][1]
             title = articletitle_node.text
             # year
-            year_node = pubmedarticle.find('MedlineCitation').find('Article').find('Journal').find('JournalIssue').find('PubDate').find('Year')  # pubmedarticle[0][3][0][1][2][0]
+            year_node = pubmedarticle.find('MedlineCitation').find('Article').find('Journal').find('JournalIssue').\
+                find('PubDate').find('Year')  # pubmedarticle[0][3][0][1][2][0]
             year = year_node.text
             # abstractText
-            abstracttext_node = pubmedarticle.find('MedlineCitation').find('Article').find('Abstract').find('AbstractText')  # [0][3][3][0]
+            abstracttext_node = pubmedarticle.find('MedlineCitation').find('Article').find('Abstract').\
+                find('AbstractText')  # [0][3][3][0]
             abstractText = {'ab_es': abstracttext_node.text}
             # decsCodes
             meshheading_nodes = pubmedarticle.find('MedlineCitation').find('MeshHeadingList').find('MeshHeading')
@@ -66,7 +69,7 @@ def parse_xml(filename, xml, mesh2decs_dict):
             for meshheading in meshheading_nodes:
                 ui = meshheading.attrib['UI']
                 decsCodes.append(mesh2decs_dict[ui])
-            parsed_xml.append(dict(journal=journal, title=title, id = id_, decsCodes=decsCodes, year=year, \
+            parsed_xml.append(dict(journal=journal, title=title, id = id_, decsCodes=decsCodes, year=year,
                               abstractText=abstractText))
         except BaseException as e:
             # print('Skipping article', index, 'at', filename)
@@ -111,7 +114,7 @@ def collect_sentences(parsed_xmls):
     sentences2translate = []
     for index_xml, parsed_xml in enumerate(parsed_xmls):
         for index_article, article in enumerate(parsed_xmls[parsed_xml]):
-            print('Collecting sentences from article', index_article + 1, 'of', len(parsed_xmls[parsed_xml]), 'in', \
+            print('Collecting sentences from article', index_article + 1, 'of', len(parsed_xmls[parsed_xml]), 'in',
                   parsed_xml, '(', index_xml, '/', len(parsed_xmls), ')', flush=True)
             sentences2translate.append(article['title'])
             for sentence in split_sentences(article['abstractText']['ab_es']):
