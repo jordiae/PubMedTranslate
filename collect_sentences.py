@@ -27,13 +27,22 @@ def get_mesh2decs_dict(decs_codes_path):
     return mesh2decs_dict
 
 
-def read_xmls(xml_paths):
+def read_xmls(xml_paths, start_at=None):
     xmls = {}
+    work = False
+    if start_at is None:
+        work = True
     for xml_path in xml_paths:
         if xml_path[-2:] != 'gz':
-            xmls[ntpath.basename(xml_path)] = open(xml_path, 'r')
+            if start_at is not None and ntpath.basename(xml_path) == start_at:
+                work = True
+            if work:
+                xmls[ntpath.basename(xml_path)] = open(xml_path, 'r')
         else:
-            xmls[ntpath.basename(xml_path)[:-3]] = gzip.open(xml_path, 'r')
+            if start_at is not None and ntpath.basename(xml_path)[:-3] == start_at:
+                work = True
+            if work:
+                xmls[ntpath.basename(xml_path)[:-3]] = gzip.open(xml_path, 'r')
     return xmls
 
 
@@ -113,19 +122,9 @@ def inverse_splitlines(lines):
     return s
 
 
-def collect_sentences(xmls, mesh2decs_dict, start_at=None):
+def collect_sentences(xmls, mesh2decs_dict):
     # sentences2translate = []
-    work = False
-    if start_at is None:
-        work = True
-    i = 0
     for index_xml, (filename, parsed_xml) in enumerate(parse_xmls(xmls, mesh2decs_dict)):
-        if start_at is not None and filename == start_at:
-            work = True
-            print('Starting at', filename, '; skipped', i, 'xmls')
-        if not work:
-            i += 1
-            continue
         sentences2translate = []
         for index_article, article in enumerate(parsed_xml):
             print('Collecting sentences from article', index_article + 1, 'of', len(parsed_xml), 'in',
@@ -152,7 +151,7 @@ def main():
     t0 = time.time()
     mesh2decs_dict = get_mesh2decs_dict(open(DeCS_CODES_PATH, 'r'))
     xml_paths = [os.path.join(PUBMED_XMLS_PATH, path) for path in sorted(os.listdir(PUBMED_XMLS_PATH))]
-    xmls = read_xmls(xml_paths)
+    xmls = read_xmls(xml_paths, start_at='pubmed19n0262.xml')
     # parsed_xmls = parse_xmls(xmls, mesh2decs_dict)
     collect_sentences(xmls, mesh2decs_dict, start_at='pubmed19n0262.xml')
     t1 = time.time()
