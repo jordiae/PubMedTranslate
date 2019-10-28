@@ -153,7 +153,7 @@ def main():
     xml_paths = [os.path.join(PUBMED_XMLS_PATH, path) for path in sorted(os.listdir(PUBMED_XMLS_PATH))]
     xmls = read_xmls(xml_paths, start_at='pubmed19n0262.xml')
     # parsed_xmls = parse_xmls(xmls, mesh2decs_dict)
-    collect_sentences(xmls, mesh2decs_dict, start_at='pubmed19n0262.xml')
+    collect_sentences(xmls, mesh2decs_dict)
     t1 = time.time()
     print('Ellapsed', t1-t0, flush=True)
 
