@@ -133,7 +133,7 @@ def collect_sentences(xmls, mesh2decs_dict, skip_count=0):
         sentences2translate = []
         for index_article, article in enumerate(parsed_xml):
             print('Collecting sentences from article', index_article + 1, 'of', len(parsed_xml), 'in',
-                  filename, '(', index_xml + skip_count, '/', len(xmls), ')', flush=True)
+                  filename, '(', index_xml + skip_count, '/', len(xmls) + skip_count, ')', flush=True)
             sentences2translate.append(article['title'])
             for sentence in split_sentences(article['abstractText']['ab_es']):
                 sentences2translate.append(sentence)
