@@ -32,18 +32,23 @@ def read_xmls(xml_paths, start_at=None):
     work = False
     if start_at is None:
         work = True
+    skip_count = 0
     for xml_path in xml_paths:
         if xml_path[-2:] != 'gz':
             if start_at is not None and ntpath.basename(xml_path) == start_at:
                 work = True
             if work:
                 xmls[ntpath.basename(xml_path)] = open(xml_path, 'r')
+            else:
+                skip_count += 1
         else:
             if start_at is not None and ntpath.basename(xml_path)[:-3] == start_at:
                 work = True
             if work:
                 xmls[ntpath.basename(xml_path)[:-3]] = gzip.open(xml_path, 'r')
-    return xmls
+            else:
+                skip_count += 1
+    return xmls, skip_count
 
 
 def parse_xml(filename, xml, mesh2decs_dict):
@@ -122,13 +127,13 @@ def inverse_splitlines(lines):
     return s
 
 
-def collect_sentences(xmls, mesh2decs_dict):
+def collect_sentences(xmls, mesh2decs_dict, skip_count=0):
     # sentences2translate = []
     for index_xml, (filename, parsed_xml) in enumerate(parse_xmls(xmls, mesh2decs_dict)):
         sentences2translate = []
         for index_article, article in enumerate(parsed_xml):
             print('Collecting sentences from article', index_article + 1, 'of', len(parsed_xml), 'in',
-                  filename, '(', index_xml, '/', len(xmls), ')', flush=True)
+                  filename, '(', index_xml + skip_count, '/', len(xmls), ')', flush=True)
             sentences2translate.append(article['title'])
             for sentence in split_sentences(article['abstractText']['ab_es']):
                 sentences2translate.append(sentence)
@@ -151,9 +156,9 @@ def main():
     t0 = time.time()
     mesh2decs_dict = get_mesh2decs_dict(open(DeCS_CODES_PATH, 'r'))
     xml_paths = [os.path.join(PUBMED_XMLS_PATH, path) for path in sorted(os.listdir(PUBMED_XMLS_PATH))]
-    xmls = read_xmls(xml_paths, start_at='pubmed19n0262.xml')
+    xmls, skip_count = read_xmls(xml_paths, start_at='pubmed19n0262.xml')
     # parsed_xmls = parse_xmls(xmls, mesh2decs_dict)
-    collect_sentences(xmls, mesh2decs_dict)
+    collect_sentences(xmls, mesh2decs_dict, skip_count)
     t1 = time.time()
     print('Ellapsed', t1-t0, flush=True)
 
