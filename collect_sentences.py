@@ -1,7 +1,6 @@
 import os
 import ntpath
 import xml.etree.ElementTree as ET
-import tempfile
 import gzip
 import time
 import sys
@@ -106,16 +105,16 @@ def split_sentences(text):
         return []
     directory = os.getcwd()
     os.chdir(GENIASS_PATH)
-    input_tempfile = tempfile.NamedTemporaryFile()
-    output_tempfile = tempfile.NamedTemporaryFile()
-    with open(input_tempfile.name, 'w') as f:
+    input_filenane = 'splitter_in.txt'
+    output_filename = 'splitter_out.txt'
+    with open(input_filenane, 'w') as f:
         f.write(text)
-    os.system('./' + GENIASS_EX + ' ' + input_tempfile.name + ' ' + output_tempfile.name + ' >/dev/null 2>&1')
+    with open(output_filename, 'w') as f:
+        f.write('')
+    os.system('./' + GENIASS_EX + ' ' + input_filenane + ' ' + output_filename + ' >/dev/null 2>&1')
     split = []
-    with open(output_tempfile.name, 'r') as f:
+    with open(output_filename, 'r') as f:
         split = f.readlines()
-    input_tempfile.close()
-    output_tempfile.close()
     os.chdir(directory)
     return split
 
@@ -156,7 +155,7 @@ def main():
     t0 = time.time()
     mesh2decs_dict = get_mesh2decs_dict(open(DeCS_CODES_PATH, 'r'))
     xml_paths = [os.path.join(PUBMED_XMLS_PATH, path) for path in sorted(os.listdir(PUBMED_XMLS_PATH))]
-    xmls, skip_count = read_xmls(xml_paths, start_at='pubmed19n0262.xml')
+    xmls, skip_count = read_xmls(xml_paths, start_at='pubmed19n0300.xml')
     # parsed_xmls = parse_xmls(xmls, mesh2decs_dict)
     collect_sentences(xmls, mesh2decs_dict, skip_count)
     t1 = time.time()
