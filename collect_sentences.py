@@ -138,7 +138,9 @@ def collect_sentences(xmls, mesh2decs_dict, skip_count=0):
                 sentences2translate.append(sentence)
         sentences_path = os.path.join(TEMP_PATH, 'sentences_en.src')
         with open(sentences_path, 'a') as f:
-            f.write(inverse_splitlines([s.strip() for s in sentences2translate]))
+            non_none_sentences2translate = [s for s in sentences2translate if s is not None]
+            if len(non_none_sentences2translate) > 0:
+                f.write(inverse_splitlines([s.strip() for s in non_none_sentences2translate]))
     # return sentences2translate
 
 
@@ -155,7 +157,7 @@ def main():
     t0 = time.time()
     mesh2decs_dict = get_mesh2decs_dict(open(DeCS_CODES_PATH, 'r'))
     xml_paths = [os.path.join(PUBMED_XMLS_PATH, path) for path in sorted(os.listdir(PUBMED_XMLS_PATH))]
-    xmls, skip_count = read_xmls(xml_paths, start_at='pubmed19n0300.xml')
+    xmls, skip_count = read_xmls(xml_paths, start_at='pubmed19n0821.xml')
     # parsed_xmls = parse_xmls(xmls, mesh2decs_dict)
     collect_sentences(xmls, mesh2decs_dict, skip_count)
     t1 = time.time()
