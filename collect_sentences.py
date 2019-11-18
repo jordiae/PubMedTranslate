@@ -37,6 +37,7 @@ def get_mesh2decs_dict(decs_codes_path):
 
 
 def read_xmls(xml_paths, start_at=None, end_at=None):
+    # start_at included, end_at NOT included
     xmls = {}
     work = False
     if start_at is None:
