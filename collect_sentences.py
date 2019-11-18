@@ -37,16 +37,17 @@ def get_mesh2decs_dict(decs_codes_path):
 
 
 def read_xmls(xml_paths, start_at=None, end_at=None):
-    # start_at included, end_at NOT included
+    # start_at and end_at both included
     xmls = {}
     work = False
     if start_at is None:
         work = True
     skip_count = 0
+    end = False
     for xml_path in xml_paths:
         if xml_path[-2:] != 'gz':
             if end_at is not None and ntpath.basename(xml_path) == end_at:
-                break
+                end = True
             if start_at is not None and ntpath.basename(xml_path) == start_at:
                 work = True
             if work:
@@ -55,13 +56,15 @@ def read_xmls(xml_paths, start_at=None, end_at=None):
                 skip_count += 1
         else:
             if end_at is not None and ntpath.basename(xml_path) == end_at:
-                break
+                end = True
             if start_at is not None and ntpath.basename(xml_path)[:-3] == start_at:
                 work = True
             if work:
                 xmls[ntpath.basename(xml_path)[:-3]] = gzip.open(xml_path, 'r')
             else:
                 skip_count += 1
+        if end:
+            break
     return xmls, skip_count
 
 
@@ -151,7 +154,7 @@ def collect_sentences(xmls, mesh2decs_dict, skip_count=0):
         sentences2translate = []
         for index_article, article in enumerate(parsed_xml):
             print('Collecting sentences from article', index_article + 1, 'of', len(parsed_xml), 'in',
-                  filename, '(', index_xml + skip_count, '/', len(xmls) + skip_count, ')', flush=True)
+                  filename, '(', index_xml + skip_count + 1, '/', len(xmls) + skip_count, ')', flush=True)
             sentences2translate.append(article['title'])
             for sentence in split_sentences(article['abstractText']['ab_en']):
                 sentences2translate.append(sentence)
