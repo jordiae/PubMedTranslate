@@ -15,19 +15,6 @@ TEMP_PATH = os.path.join('output', 'temp')
 
 START_AT = None
 END_AT = None
-if len(sys.argv[1:]) > 2:
-    START_AT = sys.argv[1]
-    END_AT = sys.argv[2]
-NAME = ''
-if START_AT is not None:
-    NAME += START_AT + '___'
-if END_AT is not None:
-    if len(NAME) == 0:
-        NAME += '___'
-    NAME += + END_AT + '___'
-
-sys.stdout = open(os.path.join(OUTPUT_PATH, NAME + 'log.txt'), 'w')
-sys.stderr = open(os.path.join(OUTPUT_PATH, NAME + 'err.txt'), 'w')
 
 
 def get_mesh2decs_dict(decs_codes_path):
@@ -179,6 +166,20 @@ def collect_sentences_from_parsed_xmls(parsed_xmls):
 
 
 def main():
+    if len(sys.argv[1:]) > 2:
+        START_AT = sys.argv[1]
+        END_AT = sys.argv[2]
+    if START_AT is not None:
+        NAME += START_AT + '___'
+    if END_AT is not None:
+        if len(NAME) == 0:
+            NAME += '___'
+        NAME += + END_AT + '___'
+    print(NAME)
+
+    #sys.stdout = open(os.path.join(OUTPUT_PATH, NAME + 'log.txt'), 'w')
+    #sys.stderr = open(os.path.join(OUTPUT_PATH, NAME + 'err.txt'), 'w')
+
     t0 = time.time()
     mesh2decs_dict = get_mesh2decs_dict(open(DeCS_CODES_PATH, 'r'))
     xml_paths = [os.path.join(PUBMED_XMLS_PATH, path) for path in sorted(os.listdir(PUBMED_XMLS_PATH))]
