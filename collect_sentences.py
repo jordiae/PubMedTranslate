@@ -178,12 +178,8 @@ def main():
         if len(name) == 0:
             name += '___'
         name += end_at + '___'
-    print(name);
-    print();
-    print(sys.argv);exit()
-
-    #sys.stdout = open(os.path.join(OUTPUT_PATH, name + '___log.txt'), 'w')
-    #sys.stderr = open(os.path.join(OUTPUT_PATH, name + '___err.txt'), 'w')
+    sys.stdout = open(os.path.join(OUTPUT_PATH, name + '___log.txt'), 'w')
+    sys.stderr = open(os.path.join(OUTPUT_PATH, name + '___err.txt'), 'w')
 
     t0 = time.time()
     mesh2decs_dict = get_mesh2decs_dict(open(DeCS_CODES_PATH, 'r'))
