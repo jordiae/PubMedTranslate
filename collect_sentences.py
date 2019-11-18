@@ -152,7 +152,7 @@ def collect_sentences(xmls, mesh2decs_dict, skip_count=0, name=''):
                 f.write(inverse_splitlines([s.strip() for s in non_none_sentences2translate]))
     # return sentences2translate
 
-
+'''
 def collect_sentences_from_parsed_xmls(parsed_xmls):
     pass
     #collect_sentences(parsed_xmls)
@@ -160,7 +160,7 @@ def collect_sentences_from_parsed_xmls(parsed_xmls):
     # sentences_path = os.path.join(TEMP_PATH, 'sentences_en.src')
     # with open(sentences_path, 'w') as f:
     #   f.write(inverse_splitlines([s.strip() for s in sentences2translate]))
-
+'''
 
 def main():
     start_at = None
