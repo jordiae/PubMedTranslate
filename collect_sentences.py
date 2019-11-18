@@ -111,13 +111,13 @@ def parse_xmls(xmls, mesh2decs_dict):
     #return parsed_xmls
 
 
-def split_sentences(text):
+def split_sentences(text, name):
     if text is None:
         return []
     directory = os.getcwd()
     os.chdir(GENIASS_PATH)
-    input_filenane = NAME + 'splitter_in.txt'
-    output_filename = NAME + 'splitter_out.txt'
+    input_filenane = name + 'splitter_in.txt'
+    output_filename = name + 'splitter_out.txt'
     with open(input_filenane, 'w') as f:
         f.write(text)
     with open(output_filename, 'w') as f:
@@ -137,7 +137,7 @@ def inverse_splitlines(lines):
     return s
 
 
-def collect_sentences(xmls, mesh2decs_dict, skip_count=0):
+def collect_sentences(xmls, mesh2decs_dict, skip_count=0, name=''):
     # saved_filename = NAME + 'sentences_en.src'
     # sentences2translate = []
     for index_xml, (filename, parsed_xml) in enumerate(parse_xmls(xmls, mesh2decs_dict)):
@@ -146,7 +146,7 @@ def collect_sentences(xmls, mesh2decs_dict, skip_count=0):
             print('Collecting sentences from article', index_article + 1, 'of', len(parsed_xml), 'in',
                   filename, '(', index_xml + skip_count + 1, '/', len(xmls) + skip_count, ')', flush=True)
             sentences2translate.append(article['title'])
-            for sentence in split_sentences(article['abstractText']['ab_en']):
+            for sentence in split_sentences(article['abstractText']['ab_en'], name):
                 sentences2translate.append(sentence)
         sentences_path = os.path.join(TEMP_PATH, filename + '___sentences_en.src')
         with open(sentences_path, 'a') as f:
@@ -166,26 +166,31 @@ def collect_sentences_from_parsed_xmls(parsed_xmls):
 
 
 def main():
-    if len(sys.argv[1:]) > 2:
-        START_AT = sys.argv[1]
-        END_AT = sys.argv[2]
-    if START_AT is not None:
-        NAME += START_AT + '___'
-    if END_AT is not None:
-        if len(NAME) == 0:
-            NAME += '___'
-        NAME += + END_AT + '___'
-    print(NAME)
+    start_at = None
+    end_at = None
+    name = ''
+    if len(sys.argv) == 3:
+        start_at = sys.argv[1]
+        end_at = sys.argv[2]
+    if start_at is not None:
+        name += start_at + '___'
+    if end_at is not None:
+        if len(name) == 0:
+            name += '___'
+        name += end_at + '___'
+    print(name);
+    print();
+    print(sys.argv);exit()
 
-    #sys.stdout = open(os.path.join(OUTPUT_PATH, NAME + 'log.txt'), 'w')
-    #sys.stderr = open(os.path.join(OUTPUT_PATH, NAME + 'err.txt'), 'w')
+    #sys.stdout = open(os.path.join(OUTPUT_PATH, name + '___log.txt'), 'w')
+    #sys.stderr = open(os.path.join(OUTPUT_PATH, name + '___err.txt'), 'w')
 
     t0 = time.time()
     mesh2decs_dict = get_mesh2decs_dict(open(DeCS_CODES_PATH, 'r'))
     xml_paths = [os.path.join(PUBMED_XMLS_PATH, path) for path in sorted(os.listdir(PUBMED_XMLS_PATH))]
-    xmls, skip_count = read_xmls(xml_paths, start_at=START_AT, end_at=END_AT)
+    xmls, skip_count = read_xmls(xml_paths, start_at=start_at, end_at=end_at)
     # parsed_xmls = parse_xmls(xmls, mesh2decs_dict)
-    collect_sentences(xmls, mesh2decs_dict, skip_count)
+    collect_sentences(xmls, mesh2decs_dict, skip_count, name)
     t1 = time.time()
     print('Ellapsed', t1-t0, flush=True)
 
