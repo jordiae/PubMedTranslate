@@ -13,9 +13,6 @@ GENIASS_PATH = os.path.join('bin', 'geniass')
 GENIASS_EX = 'geniass'
 TEMP_PATH = os.path.join('output', 'temp')
 
-START_AT = None
-END_AT = None
-
 
 def get_mesh2decs_dict(decs_codes_path):
     lines = decs_codes_path.readlines()
