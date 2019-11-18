@@ -13,8 +13,18 @@ GENIASS_PATH = os.path.join('bin', 'geniass')
 GENIASS_EX = 'geniass'
 TEMP_PATH = os.path.join('output', 'temp')
 
-sys.stdout = open(os.path.join(OUTPUT_PATH, 'log.txt'), 'w')
-sys.stderr = open(os.path.join(OUTPUT_PATH, 'err.txt'), 'w')
+START_AT = None
+END_AT = None
+NAME = ''
+if START_AT is not None:
+    NAME += START_AT + '___'
+if END_AT is not None:
+    if len(NAME) == 0:
+        NAME += '___'
+    NAME += + END_AT + '___'
+
+sys.stdout = open(os.path.join(OUTPUT_PATH, NAME + 'log.txt'), 'w')
+sys.stderr = open(os.path.join(OUTPUT_PATH, NAME + 'err.txt'), 'w')
 
 
 def get_mesh2decs_dict(decs_codes_path):
@@ -26,7 +36,7 @@ def get_mesh2decs_dict(decs_codes_path):
     return mesh2decs_dict
 
 
-def read_xmls(xml_paths, start_at=None):
+def read_xmls(xml_paths, start_at=None, end_at=None):
     xmls = {}
     work = False
     if start_at is None:
@@ -34,6 +44,8 @@ def read_xmls(xml_paths, start_at=None):
     skip_count = 0
     for xml_path in xml_paths:
         if xml_path[-2:] != 'gz':
+            if end_at is not None and ntpath.basename(xml_path) == end_at:
+                break
             if start_at is not None and ntpath.basename(xml_path) == start_at:
                 work = True
             if work:
@@ -41,6 +53,8 @@ def read_xmls(xml_paths, start_at=None):
             else:
                 skip_count += 1
         else:
+            if end_at is not None and ntpath.basename(xml_path) == end_at:
+                break
             if start_at is not None and ntpath.basename(xml_path)[:-3] == start_at:
                 work = True
             if work:
@@ -73,9 +87,12 @@ def parse_xml(filename, xml, mesh2decs_dict):
                 find('PubDate').find('Year')  # pubmedarticle[0][3][0][1][2][0]
             year = year_node.text
             # abstractText
-            abstracttext_node = pubmedarticle.find('MedlineCitation').find('Article').find('Abstract').\
-                find('AbstractText')  # [0][3][3][0]
-            abstractText = {'ab_es': abstracttext_node.text}
+            abstracttext_nodes = pubmedarticle.find('MedlineCitation').find('Article').find('Abstract').\
+                findall('AbstractText')  # [0][3][3][0]
+            text = ''
+            for abstracttext_node in abstracttext_nodes:
+                text += abstracttext_node.text + ' '
+            abstractText = {'ab_en': text}
             # decsCodes
             meshheading_nodes = pubmedarticle.find('MedlineCitation').find('MeshHeadingList').find('MeshHeading')
             decsCodes = []
@@ -105,8 +122,8 @@ def split_sentences(text):
         return []
     directory = os.getcwd()
     os.chdir(GENIASS_PATH)
-    input_filenane = 'splitter_in.txt'
-    output_filename = 'splitter_out.txt'
+    input_filenane = NAME + 'splitter_in.txt'
+    output_filename = NAME + 'splitter_out.txt'
     with open(input_filenane, 'w') as f:
         f.write(text)
     with open(output_filename, 'w') as f:
@@ -127,6 +144,7 @@ def inverse_splitlines(lines):
 
 
 def collect_sentences(xmls, mesh2decs_dict, skip_count=0):
+    # saved_filename = NAME + 'sentences_en.src'
     # sentences2translate = []
     for index_xml, (filename, parsed_xml) in enumerate(parse_xmls(xmls, mesh2decs_dict)):
         sentences2translate = []
@@ -134,9 +152,9 @@ def collect_sentences(xmls, mesh2decs_dict, skip_count=0):
             print('Collecting sentences from article', index_article + 1, 'of', len(parsed_xml), 'in',
                   filename, '(', index_xml + skip_count, '/', len(xmls) + skip_count, ')', flush=True)
             sentences2translate.append(article['title'])
-            for sentence in split_sentences(article['abstractText']['ab_es']):
+            for sentence in split_sentences(article['abstractText']['ab_en']):
                 sentences2translate.append(sentence)
-        sentences_path = os.path.join(TEMP_PATH, 'sentences_en.src')
+        sentences_path = os.path.join(TEMP_PATH, filename + '___sentences_en.src')
         with open(sentences_path, 'a') as f:
             non_none_sentences2translate = [s for s in sentences2translate if s is not None]
             if len(non_none_sentences2translate) > 0:
@@ -157,7 +175,7 @@ def main():
     t0 = time.time()
     mesh2decs_dict = get_mesh2decs_dict(open(DeCS_CODES_PATH, 'r'))
     xml_paths = [os.path.join(PUBMED_XMLS_PATH, path) for path in sorted(os.listdir(PUBMED_XMLS_PATH))]
-    xmls, skip_count = read_xmls(xml_paths, start_at='pubmed19n0821.xml')
+    xmls, skip_count = read_xmls(xml_paths, start_at=START_AT, end_at=END_AT)
     # parsed_xmls = parse_xmls(xmls, mesh2decs_dict)
     collect_sentences(xmls, mesh2decs_dict, skip_count)
     t1 = time.time()
