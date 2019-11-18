@@ -15,6 +15,9 @@ TEMP_PATH = os.path.join('output', 'temp')
 
 START_AT = None
 END_AT = None
+if len(sys.argv[1:]) > 2:
+    START_AT = sys.argv[1]
+    END_AT = sys.argv[2]
 NAME = ''
 if START_AT is not None:
     NAME += START_AT + '___'
