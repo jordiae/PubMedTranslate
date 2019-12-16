@@ -193,6 +193,14 @@ def get_translated_sentences_idx_map():
     return translated_sentences_idx_map
 
 
+def delete_unnecessary_sentences(translated_sentences, translated_sentences_idx_map, start_at, end_at):
+    if start_at is not None:
+        translated_sentences_idx_map[0:start_at] = None
+    if end_at is not None:
+        translated_sentences_idx_map[end_at:] = None
+    return
+
+
 def main():
     start_at = None
     end_at = None
@@ -215,6 +223,7 @@ def main():
     xmls, skip_count = read_xmls(xml_paths, start_at=start_at, end_at=end_at)
     translated_sentences = open(TRANSLATED_SENTENCES_PATH, 'r').readlines()
     translated_sentences_idx_map = get_translated_sentences_idx_map()
+    delete_unnecessary_sentences(translated_sentences, translated_sentences_idx_map, start_at, end_at)
     output_path = JSONS_PATH
     insert_sentences(
         translated_sentences, translated_sentences_idx_map, output_path, xmls, mesh2decs_dict, skip_count, name)
