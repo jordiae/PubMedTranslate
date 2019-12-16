@@ -195,9 +195,11 @@ def get_translated_sentences_idx_map():
 
 def delete_unnecessary_sentences(translated_sentences, translated_sentences_idx_map, start_at, end_at):
     if start_at is not None:
-        translated_sentences_idx_map[0:start_at] = None
+        start_idx = translated_sentences_idx_map[start_at][0]
+        translated_sentences[0:start_idx] = None
     if end_at is not None:
-        translated_sentences_idx_map[end_at:] = None
+        end_idx = translated_sentences_idx_map[end_at][0]
+        translated_sentences[end_idx:] = None
     return
 
 
