@@ -9,15 +9,16 @@ from glob import glob
 import pickle
 
 PUBMED_XMLS_PATH = '/data/MESINESP/pubmed_training/baseline_pubed_xmls'
-# PUBMED_XMLS_PATH = os.path.join('data', 'pubmed_xmls')
+#PUBMED_XMLS_PATH = os.path.join('data', 'pubmed_xmls')
 DeCS_CODES_PATH = os.path.join('data', 'DeCS', 'DeCS.2019.both.v3.tsv')
 OUTPUT_PATH = os.path.join('output')
 GENIASS_PATH = os.path.join('bin', 'geniass')
 GENIASS_EX = 'geniass'
 TEMP_PATH = os.path.join('output', 'temp')
-TRANSLATED_SENTENCES_PATH = os.path.join('output', 'temp', 'all_sentences.src.translated')
+TRANSLATED_SENTENCES_PATH = os.path.join('output', 'temp', 'all_sentences.src.translated.all')
 JSONS_PATH = os.path.join('output', 'jsons')
 MAP_PATH = os.path.join(OUTPUT_PATH, "translated_sentences_idx_map.p")
+#MAP_PATH = '/data/Jordi/PubmedTranslate/output/translated_sentences_idx_map.p'
 
 
 def get_mesh2decs_dict(decs_codes_path):
@@ -150,10 +151,12 @@ def write_json(translated_parsed_xmls, output_path):
 def insert_sentences(translated_sentences, translated_sentences_idx_map, output_path, xmls, mesh2decs_dict, skip_count=0, name=''):
     xmls_to_write = []
     for index_xml, (filename, parsed_xml) in enumerate(parse_xmls(xmls, mesh2decs_dict)):
+        xml_to_write = []
         sentences2translate = []
+        sentences2translate_type = []
         translated_sentences_idx = translated_sentences_idx_map[filename][0]
         for index_article, article in enumerate(parsed_xml):
-            xml_to_write = parsed_xml.copy()
+            article_to_write = article.copy()
             print('Inserting sentences from article', index_article + 1, 'of', len(parsed_xml), 'in',
                   filename, '(', index_xml + skip_count + 1, '/', len(xmls) + skip_count, ')', flush=True)
             sentences2translate.append(article['title'])
@@ -164,19 +167,22 @@ def insert_sentences(translated_sentences, translated_sentences_idx_map, output_
             else:
                 empty_title = True
             if not empty_title:
-                xml_to_write['title_es'] = translated_sentences[translated_sentences_idx].replace('\u2581', ' ')
-                translated_sentences_idx += 1
-
-            for sentence in split_sentences(article['abstractText']['ab_en'], name):
-                sentences2translate.append(sentence)
-            non_none_sentences2translate = [s for s in sentences2translate if s is not None]
+                article_to_write['title_es'] = translated_sentences[translated_sentences_idx].replace('\u2581', ' ')
+            sp_sentences = split_sentences(article['abstractText']['ab_en'], name)
+            non_none_sentences2translate = [s for s in sp_sentences if s is not None]
             if len(non_none_sentences2translate) > 0:
-                translated_sentences_abs =\
-                    translated_sentences[translated_sentences_idx:len(non_none_sentences2translate)]
-                xml_to_write[article['abstractText']['ab_es']] = inverse_splitlines(
+                translated_sentences_abs = \
+                    translated_sentences[translated_sentences_idx+1:len(non_none_sentences2translate)]
+                article_to_write['abstractText']['ab_es'] = inverse_splitlines(
                     translated_sentences_abs, add_eol=False).replace('\u2581', ' ')
-                xmls_to_write.append((filename, xml_to_write))
-                translated_sentences_idx += len(non_none_sentences2translate)
+
+
+        for sentence in sp_sentences:
+            sentences2translate.append(sentence)
+        non_none_sentences2translate = [s for s in sentences2translate if s is not None]
+        if len(non_none_sentences2translate) > 0:
+            xmls_to_write.append((filename, article_to_write))
+            translated_sentences_idx += len(non_none_sentences2translate)
     if translated_sentences_idx != translated_sentences_idx_map[filename][1]:
         raise Exception(f'{translated_sentences_idx} != {translated_sentences_idx_map[filename][1]}')
     write_json(xmls_to_write, output_path)
