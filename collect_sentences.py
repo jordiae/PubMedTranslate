@@ -44,7 +44,7 @@ def read_xmls(xml_paths, start_at=None, end_at=None):
             else:
                 skip_count += 1
         else:
-            if end_at is not None and ntpath.basename(xml_path) == end_at:
+            if end_at is not None and ntpath.basename(xml_path)[:-3] == end_at:
                 end = True
             if start_at is not None and ntpath.basename(xml_path)[:-3] == start_at:
                 work = True
