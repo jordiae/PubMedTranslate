@@ -12,8 +12,8 @@ DeCS_CODES_PATH = os.path.join('data', 'DeCS', 'DeCS.2019.both.v3.tsv')
 OUTPUT_PATH = os.path.join('output2')
 GENIASS_PATH = os.path.join('bin', 'geniass')
 GENIASS_EX = 'geniass'
-TEMP_PATH = os.path.join('output', 'temp2')
-JSONS_PATH = os.path.join('output', 'jsons')
+TEMP_PATH = os.path.join('output2', 'temp2')
+JSONS_PATH = os.path.join('output2', 'jsons')
 
 
 def get_mesh2decs_dict(decs_codes_path):
