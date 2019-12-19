@@ -12,7 +12,7 @@ DeCS_CODES_PATH = os.path.join('data', 'DeCS', 'DeCS.2019.both.v3.tsv')
 OUTPUT_PATH = os.path.join('output2')
 GENIASS_PATH = os.path.join('bin', 'geniass')
 GENIASS_EX = 'geniass'
-TEMP_PATH = os.path.join('output2', 'temp2')
+TEMP_PATH = os.path.join('output2', 'temp')
 JSONS_PATH = os.path.join('output2', 'jsons')
 
 
@@ -153,7 +153,9 @@ def collect_sentences(jsons_path, xmls, mesh2decs_dict, skip_count=0, name=''):
         with open(sentences_path, 'a') as f:
             non_none_sentences2translate = [s for s in sentences2translate if s is not None]
             if len(non_none_sentences2translate) > 0:
-                f.write(inverse_splitlines([s.strip() for s in non_none_sentences2translate]))
+                to_write = inverse_splitlines([s.strip() for s in non_none_sentences2translate])
+                f.write(to_write)
+                #print(to_write[0:1000])
         write_json(filename, {'articles': parsed_xml}, jsons_path)
         #print()
     # return sentences2translate
