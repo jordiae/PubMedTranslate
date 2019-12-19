@@ -6,12 +6,12 @@ import time
 import sys
 
 PUBMED_XMLS_PATH = '/data/MESINESP/pubmed_training/baseline_pubed_xmls'
-# PUBMED_XMLS_PATH = os.path.join('data', 'pubmed_xmls')
+#PUBMED_XMLS_PATH = os.path.join('data', 'pubmed_xmls')
 DeCS_CODES_PATH = os.path.join('data', 'DeCS', 'DeCS.2019.both.v3.tsv')
-OUTPUT_PATH = os.path.join('output')
+OUTPUT_PATH = os.path.join('output2')
 GENIASS_PATH = os.path.join('bin', 'geniass')
 GENIASS_EX = 'geniass'
-TEMP_PATH = os.path.join('output', 'temp')
+TEMP_PATH = os.path.join('output', 'temp2')
 
 
 def get_mesh2decs_dict(decs_codes_path):
@@ -150,6 +150,7 @@ def collect_sentences(xmls, mesh2decs_dict, skip_count=0, name=''):
             non_none_sentences2translate = [s for s in sentences2translate if s is not None]
             if len(non_none_sentences2translate) > 0:
                 f.write(inverse_splitlines([s.strip() for s in non_none_sentences2translate]))
+        #print()
     # return sentences2translate
 
 '''
