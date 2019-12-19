@@ -146,15 +146,21 @@ def collect_sentences(jsons_path, xmls, mesh2decs_dict, skip_count=0, name=''):
         for index_article, article in enumerate(parsed_xml):
             print('Collecting sentences from article', index_article + 1, 'of', len(parsed_xml), 'in',
                   filename, '(', index_xml + skip_count + 1, '/', len(xmls) + skip_count, ')', flush=True)
-            sentences2translate.append(article['title'])
+            sentences2translate_article = [article['title']]
             for sentence in split_sentences(article['abstractText']['ab_en'], name):
-                sentences2translate.append(sentence)
+                sentences2translate_article.append(sentence)
+            non_none_sentences2translate_article = [s for s in sentences2translate_article if s is not None]
+            n_sentences = len(non_none_sentences2translate_article)
+            sentences2translate += non_none_sentences2translate_article
+            parsed_xml[index_article]['N_sentences'] = n_sentences
         sentences_path = os.path.join(TEMP_PATH, filename + '___sentences_en.src')
         with open(sentences_path, 'a') as f:
-            non_none_sentences2translate = [s for s in sentences2translate if s is not None]
-            if len(non_none_sentences2translate) > 0:
-                to_write = inverse_splitlines([s.strip() for s in non_none_sentences2translate])
+            #non_none_sentences2translate = [s for s in sentences2translate if s is not None]
+            #L = len(non_none_sentences2translate)
+            if len(sentences2translate) > 0:
+                to_write = inverse_splitlines([s.strip() for s in sentences2translate])
                 f.write(to_write)
+
                 #print(to_write[0:1000])
         write_json(filename, {'articles': parsed_xml}, jsons_path)
         #print()
