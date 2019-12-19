@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 import gzip
 import time
 import sys
+import json
 
 PUBMED_XMLS_PATH = '/data/MESINESP/pubmed_training/baseline_pubed_xmls'
 #PUBMED_XMLS_PATH = os.path.join('data', 'pubmed_xmls')
@@ -12,6 +13,7 @@ OUTPUT_PATH = os.path.join('output2')
 GENIASS_PATH = os.path.join('bin', 'geniass')
 GENIASS_EX = 'geniass'
 TEMP_PATH = os.path.join('output', 'temp2')
+JSONS_PATH = os.path.join('output', 'jsons')
 
 
 def get_mesh2decs_dict(decs_codes_path):
@@ -87,11 +89,13 @@ def parse_xml(filename, xml, mesh2decs_dict):
             # decsCodes
             meshheading_nodes = pubmedarticle.find('MedlineCitation').find('MeshHeadingList').find('MeshHeading')
             decsCodes = []
+            meshCodes = []
             for meshheading in meshheading_nodes:
                 ui = meshheading.attrib['UI']
                 decsCodes.append(mesh2decs_dict[ui])
-            parsed_xml.append(dict(journal=journal, title=title, id = id_, decsCodes=decsCodes, year=year,
-                              abstractText=abstractText))
+                meshCodes.append(ui)
+            parsed_xml.append(dict(journal=journal, title=title, id = id_, decsCodes=decsCodes, meshCodes=meshCodes,
+                                   year=year, abstractText=abstractText))
         except BaseException as e:
             # print('Skipping article', index, 'at', filename)
             skip += 1
@@ -134,7 +138,7 @@ def inverse_splitlines(lines):
     return s
 
 
-def collect_sentences(xmls, mesh2decs_dict, skip_count=0, name=''):
+def collect_sentences(jsons_path, xmls, mesh2decs_dict, skip_count=0, name=''):
     # saved_filename = NAME + 'sentences_en.src'
     # sentences2translate = []
     for index_xml, (filename, parsed_xml) in enumerate(parse_xmls(xmls, mesh2decs_dict)):
@@ -150,6 +154,7 @@ def collect_sentences(xmls, mesh2decs_dict, skip_count=0, name=''):
             non_none_sentences2translate = [s for s in sentences2translate if s is not None]
             if len(non_none_sentences2translate) > 0:
                 f.write(inverse_splitlines([s.strip() for s in non_none_sentences2translate]))
+        write_json(filename, {'articles': parsed_xml}, jsons_path)
         #print()
     # return sentences2translate
 
@@ -162,6 +167,14 @@ def collect_sentences_from_parsed_xmls(parsed_xmls):
     # with open(sentences_path, 'w') as f:
     #   f.write(inverse_splitlines([s.strip() for s in sentences2translate]))
 '''
+
+
+def write_json(filename, xml_to_write, output_path):
+    filename_without_extension = os.path.splitext(filename)[0]
+    json_string = json.dumps(xml_to_write)
+    with open(os.path.join(output_path, filename_without_extension + '.json'), 'w') as f:
+        f.write(json_string)
+
 
 def main():
     start_at = None
@@ -184,7 +197,7 @@ def main():
     xml_paths = [os.path.join(PUBMED_XMLS_PATH, path) for path in sorted(os.listdir(PUBMED_XMLS_PATH))]
     xmls, skip_count = read_xmls(xml_paths, start_at=start_at, end_at=end_at)
     # parsed_xmls = parse_xmls(xmls, mesh2decs_dict)
-    collect_sentences(xmls, mesh2decs_dict, skip_count, name)
+    collect_sentences(JSONS_PATH, xmls, mesh2decs_dict, skip_count, name)
     t1 = time.time()
     print('Ellapsed', t1-t0, flush=True)
 
