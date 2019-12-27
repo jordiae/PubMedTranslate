@@ -2,7 +2,7 @@ import json
 import os
 
 JSONS_PATH = 'output/jsons'
-TRANSLATED_SENTENCES_PATH = ''
+TRANSLATED_SENTENCES_PATH = 'output/temp/pubmed19n0128.xml___sentences_en.src'
 
 
 def main():
@@ -15,10 +15,11 @@ def main():
             n_sentences = int(j['articles'][art_idx]['N_sentences'])
             if n_sentences > 0:
                 sent_article = translated_sentences[sent_idx:sent_idx+n_sentences]
-                if len(j['articles'][art_idx]['title_en']) > 0:
-                    j['articles'][art_idx]['title_es'] = sent_article[0]
+                if len(j['articles'][art_idx]['title']) > 0:
+                    j['articles'][art_idx]['title_es'] = sent_article[0].strip().replace('\u2581', ' ')
                 if n_sentences > 1:
-                    j['articles'][art_idx]['abstractText']['ab_es'] = sent_article[1:]
+                    j['articles'][art_idx]['abstractText']['ab_es'] = ''.join(sent_article[1:]).replace('\n', ' ')\
+                        .strip().replace('\u2581', ' ')
             sent_idx += n_sentences
         json_string = json.dumps(j)
         with open(os.path.join(json_path), 'w') as f:
