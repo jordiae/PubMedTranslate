@@ -6,8 +6,8 @@ import time
 import sys
 import json
 
-PUBMED_XMLS_PATH = '/data/MESINESP/pubmed_training/baseline_pubed_xmls'
-#PUBMED_XMLS_PATH = os.path.join('data', 'pubmed_xmls')
+#PUBMED_XMLS_PATH = '/data/MESINESP/pubmed_training/baseline_pubed_xmls'
+PUBMED_XMLS_PATH = os.path.join('data', 'pubmed_xmls')
 DeCS_CODES_PATH = os.path.join('data', 'DeCS', 'DeCS.2019.both.v3.tsv')
 OUTPUT_PATH = os.path.join('output2')
 GENIASS_PATH = os.path.join('bin', 'geniass')
